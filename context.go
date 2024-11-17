@@ -11,6 +11,9 @@ type promiseContext struct {
 	cancel  context.CancelFunc
 }
 
+// Returns basic implementation of
+//
+//	interfaces.IPromiseContext
 func NewPromiseContext(ctx context.Context, cancel context.CancelFunc) interfaces.IPromiseContext {
 	return &promiseContext{
 		context: ctx,
