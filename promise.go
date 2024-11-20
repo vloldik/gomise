@@ -114,7 +114,6 @@ func NewPromiseWithConstructor[R any, C interfaces.IPromiseContext](ctx context.
 	promiseContext := constructor(context.WithCancel(ctx))
 	go func() {
 		executable(promiseContext, gomise.fulfill, gomise.reject)
-		gomise.rejectIfNotFulfilled()
 	}()
 	return gomise
 }
@@ -124,7 +123,6 @@ func NewPromiseFromContext[R any, C interfaces.IPromiseContext](ctx C, executabl
 	gomise := makePromise[R]()
 	go func() {
 		executable(ctx, gomise.fulfill, gomise.reject)
-		gomise.rejectIfNotFulfilled()
 	}()
 	return gomise
 }

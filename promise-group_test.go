@@ -7,7 +7,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vloldik/gomise"
-	"github.com/vloldik/gomise/interfaces"
 )
 
 type PromiseContextData struct {
@@ -59,20 +58,6 @@ func TestPromiseGroupResolving(t *testing.T) {
 	val, err := group.Execute(ctx).Await(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, resolveValue, val)
-}
-
-func TestNotFulfilledError(t *testing.T) {
-	ctx := context.Background()
-	group := gomise.NewDefaultPromiseGroup[any](
-		func(ctx interfaces.IPromiseContext, resolve func(...any), reject func(error)) {},
-		func(ctx interfaces.IPromiseContext, resolve func(...any), reject func(error)) {
-			resolve()
-		},
-	)
-
-	_, err := group.Execute(ctx).Await(ctx)
-
-	assert.ErrorIs(t, err, gomise.ErrNotFulfilled)
 }
 
 type Doer struct{}
