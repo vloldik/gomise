@@ -2,8 +2,6 @@ package gomise
 
 import (
 	"context"
-
-	"github.com/vloldik/gomise/interfaces"
 )
 
 type promiseContext struct {
@@ -13,8 +11,8 @@ type promiseContext struct {
 
 // Returns basic implementation of
 //
-//	interfaces.IPromiseContext
-func NewPromiseContext(ctx context.Context, cancel context.CancelFunc) interfaces.IPromiseContext {
+//	IPromiseContext
+func NewPromiseContext(ctx context.Context, cancel context.CancelFunc) IPromiseContext {
 	return &promiseContext{
 		context: ctx,
 		cancel:  cancel,

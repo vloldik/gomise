@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-
-	"github.com/vloldik/gomise/interfaces"
 )
 
 // ErrNotFulfilled is returned when a promise is not resolved or rejected
@@ -104,12 +102,12 @@ func makePromise[T any]() *gomise[T] {
 }
 
 // NewPromise creates a promise with default context
-func NewPromise[R any](ctx context.Context, executable interfaces.FnPromiseExecutable[interfaces.IPromiseContext]) interfaces.IPromise[R] {
-	return NewPromiseWithConstructor[R, interfaces.IPromiseContext](ctx, NewPromiseContext, executable)
+func NewPromise[R any](ctx context.Context, executable FnPromiseExecutable[IPromiseContext]) IPromise[R] {
+	return NewPromiseWithConstructor[R, IPromiseContext](ctx, NewPromiseContext, executable)
 }
 
 // NewPromiseWithConstructor creates a promise with a custom context constructor
-func NewPromiseWithConstructor[R any, C interfaces.IPromiseContext](ctx context.Context, constructor interfaces.FnContextConstructor[C], executable interfaces.FnPromiseExecutable[C]) interfaces.IPromise[R] {
+func NewPromiseWithConstructor[R any, C IPromiseContext](ctx context.Context, constructor FnContextConstructor[C], executable FnPromiseExecutable[C]) IPromise[R] {
 	gomise := makePromise[R]()
 	promiseContext := constructor(context.WithCancel(ctx))
 	go func() {
@@ -119,7 +117,7 @@ func NewPromiseWithConstructor[R any, C interfaces.IPromiseContext](ctx context.
 }
 
 // NewPromiseFromContext creates a promise from an existing context
-func NewPromiseFromContext[R any, C interfaces.IPromiseContext](ctx C, executable interfaces.FnPromiseExecutable[C]) interfaces.IPromise[R] {
+func NewPromiseFromContext[R any, C IPromiseContext](ctx C, executable FnPromiseExecutable[C]) IPromise[R] {
 	gomise := makePromise[R]()
 	go func() {
 		executable(ctx, gomise.fulfill, gomise.reject)

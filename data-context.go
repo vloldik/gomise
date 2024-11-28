@@ -2,13 +2,11 @@ package gomise
 
 import (
 	"context"
-
-	"github.com/vloldik/gomise/interfaces"
 )
 
 // Used to share data between promises in promise group
 type DataContext[D any] struct {
-	interfaces.IPromiseContext
+	IPromiseContext
 	Data D
 }
 
