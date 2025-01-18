@@ -92,6 +92,22 @@ func (p *gomise[T]) rejectIfNotFulfilled() {
 	}
 }
 
+// Handle panics if occurs
+func runPromiseExecutable[R any, C IPromiseContext](promise *gomise[R], ctx C, executable FnPromiseExecutable[C]) {
+	go func() {
+		defer func() {
+			if unknownErr := recover(); unknownErr != nil {
+				err, ok := unknownErr.(error)
+				if !ok {
+					promise.reject(errors.New("unknown error"))
+				}
+				promise.reject(err)
+			}
+		}()
+		executable(ctx, promise.fulfill, promise.reject)
+	}()
+}
+
 // makePromise creates a new promise instance
 func makePromise[T any]() *gomise[T] {
 	return &gomise[T]{
@@ -110,17 +126,17 @@ func NewPromise[R any](ctx context.Context, executable FnPromiseExecutable[IProm
 func NewPromiseWithConstructor[R any, C IPromiseContext](ctx context.Context, constructor FnContextConstructor[C], executable FnPromiseExecutable[C]) IPromise[R] {
 	gomise := makePromise[R]()
 	promiseContext := constructor(context.WithCancel(ctx))
-	go func() {
-		executable(promiseContext, gomise.fulfill, gomise.reject)
-	}()
+	runPromiseExecutable(gomise, promiseContext, executable)
 	return gomise
 }
 
 // NewPromiseFromContext creates a promise from an existing context
 func NewPromiseFromContext[R any, C IPromiseContext](ctx C, executable FnPromiseExecutable[C]) IPromise[R] {
 	gomise := makePromise[R]()
-	go func() {
-		executable(ctx, gomise.fulfill, gomise.reject)
-	}()
+	runPromiseExecutable(gomise, ctx, executable)
 	return gomise
+}
+
+func AwaitNewPromise[T any](ctx context.Context, constructor FnPromiseExecutable[IPromiseContext]) (T, error) {
+	return NewPromise[T](ctx, constructor).Await(ctx)
 }
